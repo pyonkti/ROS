@@ -1,0 +1,5 @@
+<launch>
+
+  <node name="first_demo" pkg="project1" type="move_group_interface_tutorial" respawn="false" output="screen"/>
+  
+</launch>
