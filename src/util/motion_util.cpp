@@ -1,8 +1,8 @@
-#include "project1/util/motion_util.h"
+#include "util/motion_util.h"
 
 const double tau = 2 * M_PI;
 
-void openUpGripper(trajectory_msgs::JointTrajectory& posture){
+void Motions::openUpGripper(trajectory_msgs::JointTrajectory& posture){
   posture.joint_names.resize(2);
   posture.joint_names[0] = "panda_finger_joint1";
   posture.joint_names[1] = "panda_finger_joint2";
@@ -14,7 +14,7 @@ void openUpGripper(trajectory_msgs::JointTrajectory& posture){
   posture.points[0].time_from_start = ros::Duration(0.5);
 }
 
-void closeGripper(trajectory_msgs::JointTrajectory& posture){
+void Motions::closeGripper(trajectory_msgs::JointTrajectory& posture){
   posture.joint_names.resize(2);
   posture.joint_names[0] = "panda_finger_joint1";
   posture.joint_names[1] = "panda_finger_joint2";
@@ -26,7 +26,7 @@ void closeGripper(trajectory_msgs::JointTrajectory& posture){
   posture.points[0].time_from_start = ros::Duration(0.5);
 }
 
-void pick(moveit::planning_interface::MoveGroupInterface& move_group){
+void Motions::pick(moveit::planning_interface::MoveGroupInterface& move_group){
   std::vector<moveit_msgs::Grasp> grasps;
   grasps.resize(1);
   grasps[0].grasp_pose.header.frame_id = "panda_link0";
@@ -54,7 +54,7 @@ void pick(moveit::planning_interface::MoveGroupInterface& move_group){
   move_group.pick("object", grasps);
 }
 
-void place(moveit::planning_interface::MoveGroupInterface& move_group){
+void Motions::place(moveit::planning_interface::MoveGroupInterface& move_group){
   std::vector<moveit_msgs::PlaceLocation> place_location;
   place_location.resize(1);
   place_location[0].place_pose.header.frame_id = "panda_link0";
@@ -81,7 +81,7 @@ void place(moveit::planning_interface::MoveGroupInterface& move_group){
   move_group.place("object", place_location);
 }
 
-void objectsPlacement(moveit::planning_interface::PlanningSceneInterface& planning_scene){
+void Motions::objectsPlacement(moveit::planning_interface::PlanningSceneInterface& planning_scene){
   std::vector<moveit_msgs::CollisionObject> collision_objects;
   collision_objects.resize(3);
 

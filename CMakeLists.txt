@@ -2,19 +2,18 @@ cmake_minimum_required(VERSION 3.0.2)
 project(project1)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+set(GCC_COVERAGE_COMPILE_FLAGS "-fpermissive")
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  ccf
   moveit_ros_planning_interface
-  panda_grasping
-  panda_util
   roscpp
   rospy
   std_msgs
+  moveit_visual_tools
+  rviz_visual_tools
 )
 
 ## System dependencies are found with CMake's conventions
@@ -122,13 +121,14 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-include_directories(/root/ws_moveit/catkin_ws/src/project1/include/project1/util)
+# include_directories(/root/ws_moveit/catkin_ws/src/project1/include/project1/util)
 
 ## Declare a C++ library
-add_library(${PROJECT_NAME}_motion_util 
-  src/util/motion_util.cpp
+add_library(${PROJECT_NAME}_motion_util src/util/motion_util.cpp
 )
 
 ## Add cmake target dependencies of the library
@@ -156,7 +156,9 @@ target_link_libraries(${PROJECT_NAME}_action
 ${catkin_LIBRARIES}
 ${PROJECT_NAME}_motion_util
 )
-
+target_link_libraries(${PROJECT_NAME}_motion_util
+${catkin_LIBRARIES}
+)
 #############
 ## Install ##
 #############

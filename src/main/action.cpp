@@ -14,18 +14,15 @@
 #include <std_msgs/Empty.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <moveit_visual_tools/moveit_visual_tools.h>    
-
-#include "ccf/connection/MqttConnection.h"
-#include "ccf/util/NodeUtil.h"
-#include "motion_util.h"
+#include "util/motion_util.h"
 
 std::string NODE_NAME = "first_demo";
 std::string PLANNING_GROUP = "panda_arm";
 
 const double tau = 2 * M_PI;
 
-using CetiRosToolbox::getParameter;
-using CetiRosToolbox::getPrivateParameter;
+// using CetiRosToolbox::getParameter;
+// using CetiRosToolbox::getPrivateParameter;
 
 int main(int argc, char **argv) {
     ros::init(argc, argv, NODE_NAME);
