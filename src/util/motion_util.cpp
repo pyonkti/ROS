@@ -31,14 +31,14 @@ void Motions::pick(moveit::planning_interface::MoveGroupInterface& move_group){
   grasps.resize(1);
   grasps[0].grasp_pose.header.frame_id = "panda_link0";
   tf2::Quaternion orientation;
-  orientation.setRPY(-tau / 4, -tau / 8, -tau / 4);
+  orientation.setRPY(tau / 2, 0, - tau / 8);
   grasps[0].grasp_pose.pose.orientation = tf2::toMsg(orientation);
-  grasps[0].grasp_pose.pose.position.x = 0.415;
+  grasps[0].grasp_pose.pose.position.x = 0.5;
   grasps[0].grasp_pose.pose.position.y = 0;
-  grasps[0].grasp_pose.pose.position.z = 0.5;
+  grasps[0].grasp_pose.pose.position.z = 0.53;
 
   grasps[0].pre_grasp_approach.direction.header.frame_id = "panda_link0";
-  grasps[0].pre_grasp_approach.direction.vector.x = 1.0;
+  grasps[0].pre_grasp_approach.direction.vector.z = -1.0;
   grasps[0].pre_grasp_approach.min_distance = 0.095;
   grasps[0].pre_grasp_approach.desired_distance = 0.115;
 
@@ -59,12 +59,12 @@ void Motions::place(moveit::planning_interface::MoveGroupInterface& move_group){
   place_location.resize(1);
   place_location[0].place_pose.header.frame_id = "panda_link0";
   tf2::Quaternion orientation;
-  orientation.setRPY(0, 0, tau / 4);
+  orientation.setRPY(0, 0, tau/4);
   place_location[0].place_pose.pose.orientation = tf2::toMsg(orientation);
 
   place_location[0].place_pose.pose.position.x = 0;
   place_location[0].place_pose.pose.position.y = 0.5;
-  place_location[0].place_pose.pose.position.z = 0.5;
+  place_location[0].place_pose.pose.position.z = 0.53;
 
   place_location[0].pre_place_approach.direction.header.frame_id = "panda_link0";
   place_location[0].pre_place_approach.direction.vector.z = -1.0;
@@ -73,6 +73,7 @@ void Motions::place(moveit::planning_interface::MoveGroupInterface& move_group){
 
   place_location[0].post_place_retreat.direction.header.frame_id = "panda_link0";
   place_location[0].post_place_retreat.direction.vector.y = -1.0;
+  place_location[0].post_place_retreat.direction.vector.z = 1.0;
   place_location[0].post_place_retreat.min_distance = 0.1;
   place_location[0].post_place_retreat.desired_distance = 0.25;
 
@@ -128,14 +129,14 @@ void Motions::objectsPlacement(moveit::planning_interface::PlanningSceneInterfac
   collision_objects[2].primitives.resize(1);
   collision_objects[2].primitives[0].type = collision_objects[1].primitives[0].BOX;
   collision_objects[2].primitives[0].dimensions.resize(3);
-  collision_objects[2].primitives[0].dimensions[0] = 0.02;
-  collision_objects[2].primitives[0].dimensions[1] = 0.02;
-  collision_objects[2].primitives[0].dimensions[2] = 0.2;
+  collision_objects[2].primitives[0].dimensions[0] = 0.03;
+  collision_objects[2].primitives[0].dimensions[1] = 0.03;
+  collision_objects[2].primitives[0].dimensions[2] = 0.03;
 
   collision_objects[2].primitive_poses.resize(1);
   collision_objects[2].primitive_poses[0].position.x = 0.5;
   collision_objects[2].primitive_poses[0].position.y = 0;
-  collision_objects[2].primitive_poses[0].position.z = 0.5;
+  collision_objects[2].primitive_poses[0].position.z = 0.415;
   collision_objects[2].primitive_poses[0].orientation.w = 1.0;
 
   collision_objects[2].operation = collision_objects[2].ADD;

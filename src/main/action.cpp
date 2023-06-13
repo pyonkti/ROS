@@ -29,11 +29,12 @@ int main(int argc, char **argv) {
     ros::NodeHandle n(NODE_NAME);
 
     ROS_INFO_NAMED("Robotic assembly demo", ">>>>>>>>>>>>>>>> WAITING FOR ROBOT INIT <<<<<<<<<<<<<<<");
-    ros::WallDuration(3.0).sleep();
+    //ros::WallDuration(3.0).sleep();
     ROS_INFO_NAMED("Robotic assembly demo", ">>>>>>>>>>>>>>>>> WAKING UP AFTER INIT <<<<<<<<<<<<<<<<");
 
-    ros::spinOnce();
-    ros::WallDuration(1.0).sleep();
+    ros::AsyncSpinner spinner(1);
+    spinner.start();
+    //ros::WallDuration(1.0).sleep();
 
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
     moveit::planning_interface::MoveGroupInterface group(PLANNING_GROUP);
@@ -44,22 +45,40 @@ int main(int argc, char **argv) {
     visual_tools.deleteAllMarkers();
     visual_tools.loadRemoteControl();
 
-    Eigen::Isometry3d text_pose = Eigen::Isometry3d::Identity();
-    text_pose.translation().z() = 1.0;
-    visual_tools.publishText(text_pose, "First Demo", rvt::WHITE, rvt::XLARGE);
-    visual_tools.trigger();
+    ROS_INFO_NAMED("tutorial", "Planning frame: %s", group.getPlanningFrame().c_str());
+    ROS_INFO_NAMED("tutorial", "End effector link: %s", group.getEndEffectorLink().c_str());
+
+    ROS_INFO_NAMED("tutorial", "Available Planning Groups:");
+    std::copy(group.getJointModelGroupNames().begin(),
+              group.getJointModelGroupNames().end(), std::ostream_iterator<std::string>(std::cout, ", "));
+
     visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to start the demo");
 
+
     Motions motion;
+    moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+
     motion.objectsPlacement(planning_scene_interface);
-    ros::WallDuration(1.0).sleep();
+    //visual_tools.deleteAllMarkers();
+    //visual_tools.publishText(text_pose, "Objects pose", rvt::WHITE, rvt::XLARGE);
+    //visual_tools.trigger();
+    //visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
 
     motion.pick(group);
-    ros::WallDuration(1.0).sleep();
+
+    //visual_tools.deleteAllMarkers();
+    //visual_tools.trigger();
+    //visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
 
     motion.place(group);
 
-    ros::waitForShutdown();
+    bool success = (group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
+    ROS_INFO_NAMED("tutorial", "Visualizing plan (place objects) %s", success ? "" : "FAILED");
+    //visual_tools.deleteAllMarkers();
+    //visual_tools.trigger();
+
+    ros::WallDuration(2.0).sleep();
+    ros::shutdown();
   return 0;
 }
 
