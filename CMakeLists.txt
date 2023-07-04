@@ -16,6 +16,8 @@ find_package(catkin REQUIRED COMPONENTS
   rviz_visual_tools
 )
 
+find_package(behaviortree_cpp REQUIRED)
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -155,6 +157,7 @@ add_executable(${PROJECT_NAME}_action src/main/action.cpp)
 target_link_libraries(${PROJECT_NAME}_action
 ${catkin_LIBRARIES}
 ${PROJECT_NAME}_motion_util
+${PROJECT_NAME} BT::behaviortree_cpp
 )
 target_link_libraries(${PROJECT_NAME}_motion_util
 ${catkin_LIBRARIES}

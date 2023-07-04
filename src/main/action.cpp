@@ -24,6 +24,9 @@ const double tau = 2 * M_PI;
 // using CetiRosToolbox::getParameter;
 // using CetiRosToolbox::getPrivateParameter;
 
+using namespace BT;
+using namespace std::chrono_literals;
+
 int main(int argc, char **argv) {
     ros::init(argc, argv, NODE_NAME);
     ros::NodeHandle n(NODE_NAME);
@@ -52,25 +55,33 @@ int main(int argc, char **argv) {
     std::copy(group.getJointModelGroupNames().begin(),
               group.getJointModelGroupNames().end(), std::ostream_iterator<std::string>(std::cout, ", "));
 
-    visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to start the demo");
-
-
     Motions motion;
-    moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+    BT::BehaviorTreeFactory factory;
+    factory.registerNodeType<ObjectsPlacement>("ObjectsPlacement", &planning_scene_interface);
+    factory.registerNodeType<PickAction>("PickAction", &group);
+    factory.registerNodeType<PlaceAction>("PlaceAction", &group);
 
-    motion.objectsPlacement(planning_scene_interface);
+    auto tree = factory.createTreeFromFile("./../bt_tree.xml");
+    tree.tickWhileRunning();
+    
+
+    
+
+    //motion.objectsPlacement(planning_scene_interface);
+
     //visual_tools.deleteAllMarkers();
     //visual_tools.publishText(text_pose, "Objects pose", rvt::WHITE, rvt::XLARGE);
     //visual_tools.trigger();
     //visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
 
-    motion.pick(group);
+    //motion.pick(group);
 
     //visual_tools.deleteAllMarkers();
     //visual_tools.trigger();
     //visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
 
-    motion.place(group);
+    //motion.place(group);
+    moveit::planning_interface::MoveGroupInterface::Plan my_plan;
 
     bool success = (group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
     ROS_INFO_NAMED("tutorial", "Visualizing plan (place objects) %s", success ? "" : "FAILED");
