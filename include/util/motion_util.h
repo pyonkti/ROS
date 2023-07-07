@@ -24,9 +24,11 @@ class PickAction: public SyncActionNode{
     private:
         moveit::planning_interface::MoveGroupInterface& move_group;
     public:
-        PickAction(const std::string& name, const NodeConfig& config, moveit::planning_interface::MoveGroupInterface& move_group):
+        PickAction(const std::string& name, const NodeConfig& config, 
+            moveit::planning_interface::MoveGroupInterface move_group):
             SyncActionNode(name, config),
             move_group(move_group){}
+        static PortsList providedPorts() { return {}; }
         NodeStatus tick() override;
 };
 
@@ -34,9 +36,11 @@ class PlaceAction: public SyncActionNode{
     private:
         moveit::planning_interface::MoveGroupInterface& move_group;
     public:
-        PlaceAction(const std::string& name, const NodeConfig& config, moveit::planning_interface::MoveGroupInterface& move_group):
+        PlaceAction(const std::string& name, const NodeConfig& config, 
+            moveit::planning_interface::MoveGroupInterface move_group):
             SyncActionNode(name, config),
             move_group(move_group){}
+        static PortsList providedPorts() { return {}; }
         NodeStatus tick() override;
 };
 
@@ -44,9 +48,11 @@ class ObjectsPlacement: public SyncActionNode{
     private:
         moveit::planning_interface::PlanningSceneInterface& planning_scene;
     public:
-        ObjectsPlacement(const std::string& name, const NodeConfig& config, moveit::planning_interface::PlanningSceneInterface& planning_scene):
+        ObjectsPlacement(const std::string& name, const NodeConfig& config, 
+            moveit::planning_interface::PlanningSceneInterface& planning_scene):
             SyncActionNode(name, config),
             planning_scene(planning_scene){}
+        static PortsList providedPorts() { return {}; }
         NodeStatus tick() override;
 };
 

@@ -25,7 +25,6 @@ const double tau = 2 * M_PI;
 // using CetiRosToolbox::getPrivateParameter;
 
 using namespace BT;
-using namespace std::chrono_literals;
 
 int main(int argc, char **argv) {
     ros::init(argc, argv, NODE_NAME);
@@ -57,7 +56,7 @@ int main(int argc, char **argv) {
 
     Motions motion;
     BT::BehaviorTreeFactory factory;
-    factory.registerNodeType<ObjectsPlacement>("ObjectsPlacement", &planning_scene_interface);
+    factory.registerNodeType<ObjectsPlacement>("ObjectsPlacement", planning_scene_interface);
     factory.registerNodeType<PickAction>("PickAction", &group);
     factory.registerNodeType<PlaceAction>("PlaceAction", &group);
 
