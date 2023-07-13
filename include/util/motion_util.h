@@ -18,6 +18,9 @@ class Motions{
         ~Motions(){};
         static void openUpGripper(trajectory_msgs::JointTrajectory& posture);
         static void closeGripper(trajectory_msgs::JointTrajectory& posture);
+        std::vector<moveit_msgs::Grasp> pick(moveit::planning_interface::MoveGroupInterface& move_group);
+        std::vector<moveit_msgs::PlaceLocation> place(moveit::planning_interface::MoveGroupInterface& move_group);
+        std::vector<moveit_msgs::CollisionObject> objectsPlacement(moveit::planning_interface::PlanningSceneInterface& planning_scene);
 };
 
 class PickAction: public SyncActionNode{
@@ -28,7 +31,6 @@ class PickAction: public SyncActionNode{
             moveit::planning_interface::MoveGroupInterface move_group):
             SyncActionNode(name, config),
             move_group(move_group){}
-        static PortsList providedPorts() { return {}; }
         NodeStatus tick() override;
 };
 
@@ -40,7 +42,6 @@ class PlaceAction: public SyncActionNode{
             moveit::planning_interface::MoveGroupInterface move_group):
             SyncActionNode(name, config),
             move_group(move_group){}
-        static PortsList providedPorts() { return {}; }
         NodeStatus tick() override;
 };
 
@@ -51,8 +52,7 @@ class ObjectsPlacement: public SyncActionNode{
         ObjectsPlacement(const std::string& name, const NodeConfig& config, 
             moveit::planning_interface::PlanningSceneInterface& planning_scene):
             SyncActionNode(name, config),
-            planning_scene(planning_scene){}
-        static PortsList providedPorts() { return {}; }
+            planning_scene(planning_scene){}    
         NodeStatus tick() override;
 };
 
