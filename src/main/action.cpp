@@ -40,6 +40,7 @@ int main(int argc, char **argv) {
 
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
     moveit::planning_interface::MoveGroupInterface group(PLANNING_GROUP);
+    moveit::planning_interface::MoveGroupInterface::Plan my_plan;
     group.setPlanningTime(45.0);
 
     namespace rvt = rviz_visual_tools;
@@ -56,9 +57,9 @@ int main(int argc, char **argv) {
 
     Motions motion;
     BT::BehaviorTreeFactory factory;
-    factory.registerNodeType<ObjectsPlacement>("ObjectsPlacement",std::ref(planning_scene_interface));
-    factory.registerNodeType<PickAction>("PickAction",std::ref(group));
-    factory.registerNodeType<PlaceAction>("PlaceAction",std::ref(group));
+    factory.registerNodeType<ObjectsPlacement>("ObjectsPlacement",std::ref(planning_scene_interface),std::ref(my_plan));
+    factory.registerNodeType<PickAction>("PickAction",std::ref(group),std::ref(my_plan));
+    factory.registerNodeType<PlaceAction>("PlaceAction",std::ref(group),std::ref(my_plan));
 
     auto tree = factory.createTreeFromFile("./../bt_tree.xml");
     tree.tickWhileRunning();
@@ -80,7 +81,6 @@ int main(int argc, char **argv) {
     //visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
 
     //motion.place(group);
-    moveit::planning_interface::MoveGroupInterface::Plan my_plan;
 
     bool success = (group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
     ROS_INFO_NAMED("tutorial", "Visualizing plan (place objects) %s", success ? "" : "FAILED");
