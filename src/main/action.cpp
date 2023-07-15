@@ -56,9 +56,9 @@ int main(int argc, char **argv) {
 
     Motions motion;
     BT::BehaviorTreeFactory factory;
-    factory.registerNodeType<ObjectsPlacement>("ObjectsPlacement", planning_scene_interface);
-    factory.registerNodeType<PickAction>("PickAction", &group);
-    factory.registerNodeType<PlaceAction>("PlaceAction", &group);
+    factory.registerNodeType<ObjectsPlacement>("ObjectsPlacement",std::ref(planning_scene_interface));
+    factory.registerNodeType<PickAction>("PickAction",std::ref(group));
+    factory.registerNodeType<PlaceAction>("PlaceAction",std::ref(group));
 
     auto tree = factory.createTreeFromFile("./../bt_tree.xml");
     tree.tickWhileRunning();
