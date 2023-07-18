@@ -53,7 +53,8 @@ int main(int argc, char **argv) {
 
     ROS_INFO_NAMED("tutorial", "Available Planning Groups:");
     std::copy(group.getJointModelGroupNames().begin(),
-              group.getJointModelGroupNames().end(), std::ostream_iterator<std::string>(std::cout, ", "));
+              group.getJointModelGroupNames().end(), std::ostream_iterator<std::string>(std::cout, ","));
+    std::cout<<"\n";
 
     Motions motion;
     BT::BehaviorTreeFactory factory;
@@ -61,7 +62,7 @@ int main(int argc, char **argv) {
     factory.registerNodeType<PickAction>("PickAction",std::ref(group),std::ref(my_plan));
     factory.registerNodeType<PlaceAction>("PlaceAction",std::ref(group),std::ref(my_plan));
 
-    auto tree = factory.createTreeFromFile("./../bt_tree.xml");
+    auto tree = factory.createTreeFromFile("/root/new_ws/src/project1/src/main/bt_tree.xml");
     tree.tickWhileRunning();
     
 
@@ -81,9 +82,6 @@ int main(int argc, char **argv) {
     //visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
 
     //motion.place(group);
-
-    bool success = (group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
-    ROS_INFO_NAMED("tutorial", "Visualizing plan (place objects) %s", success ? "" : "FAILED");
     //visual_tools.deleteAllMarkers();
     //visual_tools.trigger();
 

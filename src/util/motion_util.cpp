@@ -63,6 +63,7 @@ NodeStatus PickAction::tick(){
   move_group.pick("object", motion.pick());
   bool success = (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
   if (success) {
+    ROS_INFO_NAMED("tutorial", "Visualizing plan (pick object) %s", success ? "" : "FAILED");
     return NodeStatus::SUCCESS;
   }else return NodeStatus::FAILURE;
 }
@@ -104,6 +105,7 @@ NodeStatus PlaceAction::tick(){
   move_group.place("object", motion.place());
   bool success = (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
   if (success) {
+    ROS_INFO_NAMED("tutorial", "Visualizing plan (place object) %s", success ? "" : "FAILED");
     return NodeStatus::SUCCESS;
   }else return NodeStatus::FAILURE;
 }
