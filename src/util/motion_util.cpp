@@ -27,7 +27,7 @@ void Motions::closeGripper(trajectory_msgs::JointTrajectory& posture){
   posture.points[0].time_from_start = ros::Duration(0.5);
 }
 
-std::vector<moveit_msgs::Grasp> Motions::pick(moveit::planning_interface::MoveGroupInterface& move_group){
+std::vector<moveit_msgs::Grasp> Motions::pick(){
   std::vector<moveit_msgs::Grasp> grasps;
   grasps.resize(1);
   grasps[0].grasp_pose.header.frame_id = "panda_link0";
@@ -57,7 +57,18 @@ std::vector<moveit_msgs::Grasp> Motions::pick(moveit::planning_interface::MoveGr
   return grasps;
 }
 
-std::vector<moveit_msgs::PlaceLocation> Motions::place(moveit::planning_interface::MoveGroupInterface& move_group){
+NodeStatus PickAction::tick(){
+  Motions motion;
+  move_group.setSupportSurfaceName("table1");
+  move_group.pick("object", motion.pick());
+  bool success = (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
+  if (success) {
+    ROS_INFO_NAMED("tutorial", "Visualizing plan (pick object) %s", success ? "" : "FAILED");
+    return NodeStatus::SUCCESS;
+  }else return NodeStatus::FAILURE;
+}
+
+std::vector<moveit_msgs::PlaceLocation> Motions::place(){
   std::vector<moveit_msgs::PlaceLocation> place_location;
   place_location.resize(1);
   place_location[0].place_pose.header.frame_id = "panda_link0";
@@ -88,7 +99,18 @@ std::vector<moveit_msgs::PlaceLocation> Motions::place(moveit::planning_interfac
   return place_location;
 }
 
-std::vector<moveit_msgs::CollisionObject> Motions::objectsPlacement(moveit::planning_interface::PlanningSceneInterface& planning_scene){
+NodeStatus PlaceAction::tick(){
+  Motions motion;
+  move_group.setSupportSurfaceName("table2");
+  move_group.place("object", motion.place());
+  bool success = (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
+  if (success) {
+    ROS_INFO_NAMED("tutorial", "Visualizing plan (place object) %s", success ? "" : "FAILED");
+    return NodeStatus::SUCCESS;
+  }else return NodeStatus::FAILURE;
+}
+
+std::vector<moveit_msgs::CollisionObject> Motions::objectsPlacement(){
   std::vector<moveit_msgs::CollisionObject> collision_objects;
   collision_objects.resize(3);
 
@@ -150,4 +172,10 @@ std::vector<moveit_msgs::CollisionObject> Motions::objectsPlacement(moveit::plan
    // return type changed, no longer implemented here
   //planning_scene.applyCollisionObjects(collision_objects);
   return collision_objects;
+}
+
+NodeStatus ObjectsPlacement::tick(){
+  Motions motion;
+  planning_scene.applyCollisionObjects(motion.objectsPlacement());
+  return NodeStatus::SUCCESS;
 }

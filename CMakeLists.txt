@@ -156,9 +156,10 @@ add_executable(${PROJECT_NAME}_action src/main/action.cpp)
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_action
 ${catkin_LIBRARIES}
+BT::behaviortree_cpp
 ${PROJECT_NAME}_motion_util
-${PROJECT_NAME} BT::behaviortree_cpp
 )
+
 target_link_libraries(${PROJECT_NAME}_motion_util
 ${catkin_LIBRARIES}
 )
