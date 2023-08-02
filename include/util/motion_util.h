@@ -18,8 +18,8 @@ class Motions{
         ~Motions(){};
         static void openUpGripper(trajectory_msgs::JointTrajectory& posture);
         static void closeGripper(trajectory_msgs::JointTrajectory& posture);
-        std::vector<moveit_msgs::Grasp> pick();
-        std::vector<moveit_msgs::PlaceLocation> place();
+        std::vector<moveit_msgs::Grasp> pick(std::array<float,9> grasp_poses);
+        std::vector<moveit_msgs::PlaceLocation> place(std::array<float,10> grasp_poses);
         std::vector<moveit_msgs::CollisionObject> objectsPlacement();
 };
 
@@ -27,13 +27,17 @@ class PickAction: public SyncActionNode{
     private:
         moveit::planning_interface::MoveGroupInterface& move_group;
         moveit::planning_interface::MoveGroupInterface::Plan& my_plan;
+        std::array<float,9> grasp_poses_pick;
     public:
         PickAction(const std::string& name, const NodeConfig& config, 
             moveit::planning_interface::MoveGroupInterface& arg_move_group,
-            moveit::planning_interface::MoveGroupInterface::Plan& arg_plan):
+            moveit::planning_interface::MoveGroupInterface::Plan& arg_plan,
+            std::array<float,9> arg_poses
+            ):
             SyncActionNode(name, config),
             move_group(arg_move_group),
-            my_plan(arg_plan){}
+            my_plan(arg_plan),
+            grasp_poses_pick(arg_poses){}
         NodeStatus tick() override;
         static PortsList providedPorts(){
             return {};
@@ -44,13 +48,16 @@ class PlaceAction: public SyncActionNode{
     private:
         moveit::planning_interface::MoveGroupInterface& move_group;
         moveit::planning_interface::MoveGroupInterface::Plan& my_plan;
+        std::array<float,10> grasp_poses_place;
     public:
         PlaceAction(const std::string& name, const NodeConfig& config, 
             moveit::planning_interface::MoveGroupInterface& arg_move_group,
-            moveit::planning_interface::MoveGroupInterface::Plan& arg_plan):
+            moveit::planning_interface::MoveGroupInterface::Plan& arg_plan,
+            std::array<float,10> arg_poses):
             SyncActionNode(name, config),
             move_group(arg_move_group),
-            my_plan(arg_plan){}
+            my_plan(arg_plan),
+            grasp_poses_place(arg_poses){}
         NodeStatus tick() override;
         static PortsList providedPorts(){
             return {};

@@ -41,6 +41,8 @@ int main(int argc, char **argv) {
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
     moveit::planning_interface::MoveGroupInterface group(PLANNING_GROUP);
     moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+    std::array<float,9> poses_pick = {0.5,0,0.53,-1.0,0.095,0.115,1.0,0.1,0.25};
+    std::array<float,10> poses_default_place = {0,0.5,0.53,-1.0,0.1,0.25,-1.0,1.0,0.1,0.25};
     group.setPlanningTime(45.0);
 
     namespace rvt = rviz_visual_tools;
@@ -59,10 +61,12 @@ int main(int argc, char **argv) {
     Motions motion;
     BT::BehaviorTreeFactory factory;
     factory.registerNodeType<ObjectsPlacement>("ObjectsPlacement",std::ref(planning_scene_interface),std::ref(my_plan));
-    factory.registerNodeType<PickAction>("PickAction",std::ref(group),std::ref(my_plan));
-    factory.registerNodeType<PlaceAction>("PlaceAction",std::ref(group),std::ref(my_plan));
+    factory.registerNodeType<PickAction>("PickAction",std::ref(group),std::ref(my_plan),poses_pick);
+    factory.registerNodeType<PlaceAction>("PlaceAction",std::ref(group),std::ref(my_plan),poses_default_place);
 
-    auto tree = factory.createTreeFromFile("/root/new_ws/src/project1/src/main/bt_tree.xml");
+     
+
+    auto tree = factory.createTreeFromFile("./src/project1/src/main/bt_tree.xml");
     tree.tickWhileRunning();
     
 

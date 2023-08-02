@@ -27,26 +27,26 @@ void Motions::closeGripper(trajectory_msgs::JointTrajectory& posture){
   posture.points[0].time_from_start = ros::Duration(0.5);
 }
 
-std::vector<moveit_msgs::Grasp> Motions::pick(){
+std::vector<moveit_msgs::Grasp> Motions::pick(std::array<float,9> grasp_poses){
   std::vector<moveit_msgs::Grasp> grasps;
   grasps.resize(1);
   grasps[0].grasp_pose.header.frame_id = "panda_link0";
   tf2::Quaternion orientation;
   orientation.setRPY(tau / 2, 0, - tau / 8);
   grasps[0].grasp_pose.pose.orientation = tf2::toMsg(orientation);
-  grasps[0].grasp_pose.pose.position.x = 0.5;
-  grasps[0].grasp_pose.pose.position.y = 0;
-  grasps[0].grasp_pose.pose.position.z = 0.53;
+  grasps[0].grasp_pose.pose.position.x = grasp_poses[0];
+  grasps[0].grasp_pose.pose.position.y = grasp_poses[1];
+  grasps[0].grasp_pose.pose.position.z = grasp_poses[2];
 
   grasps[0].pre_grasp_approach.direction.header.frame_id = "panda_link0";
-  grasps[0].pre_grasp_approach.direction.vector.z = -1.0;
-  grasps[0].pre_grasp_approach.min_distance = 0.095;
-  grasps[0].pre_grasp_approach.desired_distance = 0.115;
+  grasps[0].pre_grasp_approach.direction.vector.z = grasp_poses[3];
+  grasps[0].pre_grasp_approach.min_distance = grasp_poses[4];
+  grasps[0].pre_grasp_approach.desired_distance = grasp_poses[5];
 
   grasps[0].post_grasp_retreat.direction.header.frame_id = "panda_link0";
-  grasps[0].post_grasp_retreat.direction.vector.z = 1.0;
-  grasps[0].post_grasp_retreat.min_distance = 0.1;
-  grasps[0].post_grasp_retreat.desired_distance = 0.25;
+  grasps[0].post_grasp_retreat.direction.vector.z = grasp_poses[6];
+  grasps[0].post_grasp_retreat.min_distance = grasp_poses[7];
+  grasps[0].post_grasp_retreat.desired_distance = grasp_poses[8];
 
   openUpGripper(grasps[0].pre_grasp_posture);
   closeGripper(grasps[0].grasp_posture);
@@ -60,7 +60,7 @@ std::vector<moveit_msgs::Grasp> Motions::pick(){
 NodeStatus PickAction::tick(){
   Motions motion;
   move_group.setSupportSurfaceName("table1");
-  move_group.pick("object", motion.pick());
+  move_group.pick("object", motion.pick(grasp_poses_pick));
   bool success = (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
   if (success) {
     ROS_INFO_NAMED("tutorial", "Visualizing plan (pick object) %s", success ? "" : "FAILED");
@@ -68,7 +68,7 @@ NodeStatus PickAction::tick(){
   }else return NodeStatus::FAILURE;
 }
 
-std::vector<moveit_msgs::PlaceLocation> Motions::place(){
+std::vector<moveit_msgs::PlaceLocation> Motions::place(std::array<float,10> grasp_poses){
   std::vector<moveit_msgs::PlaceLocation> place_location;
   place_location.resize(1);
   place_location[0].place_pose.header.frame_id = "panda_link0";
@@ -76,20 +76,20 @@ std::vector<moveit_msgs::PlaceLocation> Motions::place(){
   orientation.setRPY(0, 0, tau/4);
   place_location[0].place_pose.pose.orientation = tf2::toMsg(orientation);
 
-  place_location[0].place_pose.pose.position.x = 0;
-  place_location[0].place_pose.pose.position.y = 0.5;
-  place_location[0].place_pose.pose.position.z = 0.53;
+  place_location[0].place_pose.pose.position.x = grasp_poses[0];
+  place_location[0].place_pose.pose.position.y = grasp_poses[1];
+  place_location[0].place_pose.pose.position.z = grasp_poses[2];
 
   place_location[0].pre_place_approach.direction.header.frame_id = "panda_link0";
-  place_location[0].pre_place_approach.direction.vector.z = -1.0;
-  place_location[0].pre_place_approach.min_distance = 0.095;
-  place_location[0].pre_place_approach.desired_distance = 0.115;
+  place_location[0].pre_place_approach.direction.vector.z = grasp_poses[3];
+  place_location[0].pre_place_approach.min_distance = grasp_poses[4];
+  place_location[0].pre_place_approach.desired_distance = grasp_poses[5];
 
   place_location[0].post_place_retreat.direction.header.frame_id = "panda_link0";
-  place_location[0].post_place_retreat.direction.vector.y = -1.0;
-  place_location[0].post_place_retreat.direction.vector.z = 1.0;
-  place_location[0].post_place_retreat.min_distance = 0.1;
-  place_location[0].post_place_retreat.desired_distance = 0.25;
+  place_location[0].post_place_retreat.direction.vector.y = grasp_poses[6];
+  place_location[0].post_place_retreat.direction.vector.z = grasp_poses[7];
+  place_location[0].post_place_retreat.min_distance = grasp_poses[8];
+  place_location[0].post_place_retreat.desired_distance = grasp_poses[9];
 
   openUpGripper(place_location[0].post_place_posture);
 
@@ -102,7 +102,7 @@ std::vector<moveit_msgs::PlaceLocation> Motions::place(){
 NodeStatus PlaceAction::tick(){
   Motions motion;
   move_group.setSupportSurfaceName("table2");
-  move_group.place("object", motion.place());
+  move_group.place("object", motion.place(grasp_poses_place));
   bool success = (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
   if (success) {
     ROS_INFO_NAMED("tutorial", "Visualizing plan (place object) %s", success ? "" : "FAILED");
@@ -169,7 +169,7 @@ std::vector<moveit_msgs::CollisionObject> Motions::objectsPlacement(){
 
   collision_objects[2].operation = collision_objects[2].ADD;
 
-   // return type changed, no longer implemented here
+  // return type changed, no longer implemented here
   //planning_scene.applyCollisionObjects(collision_objects);
   return collision_objects;
 }
