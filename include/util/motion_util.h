@@ -64,6 +64,26 @@ class PlaceAction: public SyncActionNode{
         }
 };
 
+class DefaultPlaceAction: public SyncActionNode{
+    private:
+        moveit::planning_interface::MoveGroupInterface& move_group;
+        moveit::planning_interface::MoveGroupInterface::Plan& my_plan;
+        std::array<float,10> grasp_poses_place;
+    public:
+        DefaultPlaceAction(const std::string& name, const NodeConfig& config, 
+            moveit::planning_interface::MoveGroupInterface& arg_move_group,
+            moveit::planning_interface::MoveGroupInterface::Plan& arg_plan,
+            std::array<float,10> arg_poses):
+            SyncActionNode(name, config),
+            move_group(arg_move_group),
+            my_plan(arg_plan),
+            grasp_poses_place(arg_poses){}
+        NodeStatus tick() override;
+        static PortsList providedPorts(){
+            return {};
+        }
+};
+
 class ObjectsPlacement: public SyncActionNode{
     private:
         moveit::planning_interface::PlanningSceneInterface& planning_scene;

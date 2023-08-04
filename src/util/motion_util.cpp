@@ -101,13 +101,40 @@ std::vector<moveit_msgs::PlaceLocation> Motions::place(std::array<float,10> gras
 
 NodeStatus PlaceAction::tick(){
   Motions motion;
+  geometry_msgs::Pose target_pose1;
+  target_pose1.orientation.w = 1.0;
+  target_pose1.position.x = grasp_poses_place[0];
+  target_pose1.position.y = grasp_poses_place[1];
+  target_pose1.position.z = grasp_poses_place[2];
+  move_group.setPoseTarget(target_pose1);
   move_group.setSupportSurfaceName("table2");
-  move_group.place("object", motion.place(grasp_poses_place));
-  bool success = (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
-  if (success) {
-    ROS_INFO_NAMED("tutorial", "Visualizing plan (place object) %s", success ? "" : "FAILED");
+  if (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS) {
+    ROS_INFO_NAMED("tutorial", "Visualizing plan (assigned place object)");
+    move_group.place("object", motion.place(grasp_poses_place));
     return NodeStatus::SUCCESS;
-  }else return NodeStatus::FAILURE;
+  }else {
+    ROS_INFO_NAMED("tutorial", "Place Plan failed, MoveItErrorCode: %d",move_group.plan(my_plan).val);
+    return NodeStatus::FAILURE;
+  }
+}
+
+NodeStatus DefaultPlaceAction::tick(){
+  Motions motion;
+  geometry_msgs::Pose target_pose1;
+  target_pose1.orientation.w = 1.0;
+  target_pose1.position.x = grasp_poses_place[0];
+  target_pose1.position.y = grasp_poses_place[1];
+  target_pose1.position.z = grasp_poses_place[2];
+  move_group.setPoseTarget(target_pose1);
+  move_group.setSupportSurfaceName("table2");
+  if (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS) {
+    ROS_INFO_NAMED("tutorial", "Visualizing plan (default place object)");
+    move_group.place("object", motion.place(grasp_poses_place));
+    return NodeStatus::SUCCESS;
+  }else{
+    ROS_INFO_NAMED("tutorial", "Default Place Plan failed");
+    return NodeStatus::FAILURE;
+  }
 }
 
 std::vector<moveit_msgs::CollisionObject> Motions::objectsPlacement(){

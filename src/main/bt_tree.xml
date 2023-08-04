@@ -3,7 +3,10 @@
         <Sequence name="root_sequence">
             <ObjectsPlacement name="objects_placement"/>
             <PickAction       name="pick_action"/>
-            <PlaceAction      name="place_action"/>
+            <Fallback name="place_action_fallback">
+                <PlaceAction      name="place_action"/>
+                <DefaultPlaceAction name="default_place_action"/>
+            </Fallback>
         </Sequence>
     </BehaviorTree>
 </root>
