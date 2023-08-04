@@ -102,14 +102,18 @@ std::vector<moveit_msgs::PlaceLocation> Motions::place(std::array<float,10> gras
 NodeStatus PlaceAction::tick(){
   Motions motion;
   geometry_msgs::Pose target_pose1;
-  target_pose1.orientation.w = 1.0;
   target_pose1.position.x = grasp_poses_place[0];
   target_pose1.position.y = grasp_poses_place[1];
   target_pose1.position.z = grasp_poses_place[2];
+  target_pose1.orientation.x = move_group.getCurrentPose().pose.orientation.x;
+  target_pose1.orientation.y = move_group.getCurrentPose().pose.orientation.y;
+  target_pose1.orientation.z = move_group.getCurrentPose().pose.orientation.z;
+  target_pose1.orientation.w = move_group.getCurrentPose().pose.orientation.w;
+  move_group.setStartStateToCurrentState();
   move_group.setPoseTarget(target_pose1);
-  move_group.setSupportSurfaceName("table2");
   if (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS) {
     ROS_INFO_NAMED("tutorial", "Visualizing plan (assigned place object)");
+    move_group.setSupportSurfaceName("table2");
     move_group.place("object", motion.place(grasp_poses_place));
     return NodeStatus::SUCCESS;
   }else {
@@ -121,14 +125,18 @@ NodeStatus PlaceAction::tick(){
 NodeStatus DefaultPlaceAction::tick(){
   Motions motion;
   geometry_msgs::Pose target_pose1;
-  target_pose1.orientation.w = 1.0;
   target_pose1.position.x = grasp_poses_place[0];
   target_pose1.position.y = grasp_poses_place[1];
   target_pose1.position.z = grasp_poses_place[2];
+  target_pose1.orientation.x = move_group.getCurrentPose().pose.orientation.x;
+  target_pose1.orientation.y = move_group.getCurrentPose().pose.orientation.y;
+  target_pose1.orientation.z = move_group.getCurrentPose().pose.orientation.z;
+  target_pose1.orientation.w = move_group.getCurrentPose().pose.orientation.w;
+  move_group.setStartStateToCurrentState();
   move_group.setPoseTarget(target_pose1);
-  move_group.setSupportSurfaceName("table2");
   if (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS) {
     ROS_INFO_NAMED("tutorial", "Visualizing plan (default place object)");
+    move_group.setSupportSurfaceName("table2");
     move_group.place("object", motion.place(grasp_poses_place));
     return NodeStatus::SUCCESS;
   }else{
