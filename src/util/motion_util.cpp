@@ -59,13 +59,24 @@ std::vector<moveit_msgs::Grasp> Motions::pick(std::array<float,9> grasp_poses){
 
 NodeStatus PickAction::tick(){
   Motions motion;
-  move_group.setSupportSurfaceName("table1");
-  move_group.pick("object", motion.pick(grasp_poses_pick));
-  bool success = (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
-  if (success) {
-    ROS_INFO_NAMED("tutorial", "Visualizing plan (pick object) %s", success ? "" : "FAILED");
+  geometry_msgs::Pose target_pose1;
+  target_pose1.position.x = grasp_poses_pick[0];
+  target_pose1.position.y = grasp_poses_pick[1];
+  target_pose1.position.z = grasp_poses_pick[2];
+  target_pose1.orientation.x = move_group.getCurrentPose().pose.orientation.x;
+  target_pose1.orientation.y = move_group.getCurrentPose().pose.orientation.y;
+  target_pose1.orientation.z = move_group.getCurrentPose().pose.orientation.z;
+  target_pose1.orientation.w = move_group.getCurrentPose().pose.orientation.w;
+  move_group.setStartStateToCurrentState();
+  move_group.setPoseTarget(target_pose1);
+  if (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS) {
+    ROS_INFO_NAMED("tutorial", "Visualizing plan (pick object)");
+      move_group.setSupportSurfaceName("table1");
+      move_group.pick("object", motion.pick(grasp_poses_pick));
     return NodeStatus::SUCCESS;
-  }else return NodeStatus::FAILURE;
+  }else {
+    ROS_INFO_NAMED("tutorial", "Pick Plan failed, MoveItErrorCode: %d",move_group.plan(my_plan).val);
+    return NodeStatus::FAILURE;};
 }
 
 std::vector<moveit_msgs::PlaceLocation> Motions::place(std::array<float,10> grasp_poses){
@@ -101,22 +112,29 @@ std::vector<moveit_msgs::PlaceLocation> Motions::place(std::array<float,10> gras
 
 NodeStatus PlaceAction::tick(){
   Motions motion;
-  geometry_msgs::Pose target_pose1;
-  target_pose1.position.x = grasp_poses_place[0];
-  target_pose1.position.y = grasp_poses_place[1];
-  target_pose1.position.z = grasp_poses_place[2];
+  grasp_poses_place[6] = 0;
+  geometry_msgs::Pose target_pose1 = move_group.getRandomPose().pose;
+  ROS_INFO_NAMED("tutorial", "%f,%f,%f",target_pose1.position.x,target_pose1.position.y,target_pose1.position.z);
+  grasp_poses_place[0] = target_pose1.position.x;
+  grasp_poses_place[1] = target_pose1.position.y;
+  grasp_poses_place[2] = target_pose1.position.z;
+  target_pose1.position.z += 0.25;
   target_pose1.orientation.x = move_group.getCurrentPose().pose.orientation.x;
   target_pose1.orientation.y = move_group.getCurrentPose().pose.orientation.y;
   target_pose1.orientation.z = move_group.getCurrentPose().pose.orientation.z;
   target_pose1.orientation.w = move_group.getCurrentPose().pose.orientation.w;
   move_group.setStartStateToCurrentState();
-  move_group.setPoseTarget(target_pose1);
-  if (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS) {
-    ROS_INFO_NAMED("tutorial", "Visualizing plan (assigned place object)");
+  move_group.setApproximateJointValueTarget(target_pose1);
+  if (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS) {   
     move_group.setSupportSurfaceName("table2");
-    move_group.place("object", motion.place(grasp_poses_place));
-    return NodeStatus::SUCCESS;
-  }else {
+    if (move_group.place("object", motion.place(grasp_poses_place)) == moveit::core::MoveItErrorCode::SUCCESS){
+        ROS_INFO_NAMED("tutorial", "Visualizing plan (assigned place object)");
+        return NodeStatus::SUCCESS;
+    }else{
+        ROS_INFO_NAMED("tutorial", "Place failed");
+        return NodeStatus::FAILURE;
+    }    
+  }else{
     ROS_INFO_NAMED("tutorial", "Place Plan failed, MoveItErrorCode: %d",move_group.plan(my_plan).val);
     return NodeStatus::FAILURE;
   }
@@ -127,20 +145,20 @@ NodeStatus DefaultPlaceAction::tick(){
   geometry_msgs::Pose target_pose1;
   target_pose1.position.x = grasp_poses_place[0];
   target_pose1.position.y = grasp_poses_place[1];
-  target_pose1.position.z = grasp_poses_place[2];
+  target_pose1.position.z = (grasp_poses_place[2]+ 0.25);
   target_pose1.orientation.x = move_group.getCurrentPose().pose.orientation.x;
   target_pose1.orientation.y = move_group.getCurrentPose().pose.orientation.y;
   target_pose1.orientation.z = move_group.getCurrentPose().pose.orientation.z;
   target_pose1.orientation.w = move_group.getCurrentPose().pose.orientation.w;
   move_group.setStartStateToCurrentState();
-  move_group.setPoseTarget(target_pose1);
+  move_group.setApproximateJointValueTarget(target_pose1);
   if (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS) {
     ROS_INFO_NAMED("tutorial", "Visualizing plan (default place object)");
     move_group.setSupportSurfaceName("table2");
     move_group.place("object", motion.place(grasp_poses_place));
     return NodeStatus::SUCCESS;
   }else{
-    ROS_INFO_NAMED("tutorial", "Default Place Plan failed");
+    ROS_INFO_NAMED("tutorial", "Default Place Plan failed, MoveItErrorCode: %d",move_group.plan(my_plan).val);
     return NodeStatus::FAILURE;
   }
 }
