@@ -67,26 +67,6 @@ int main(int argc, char **argv) {
 
     auto tree = factory.createTreeFromFile("./src/project1/src/main/bt_tree.xml");
     tree.tickWhileRunning();
-    
-
-    
-
-    //motion.objectsPlacement(planning_scene_interface);
-
-    //visual_tools.deleteAllMarkers();
-    //visual_tools.publishText(text_pose, "Objects pose", rvt::WHITE, rvt::XLARGE);
-    //visual_tools.trigger();
-    //visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
-
-    //motion.pick(group);
-
-    //visual_tools.deleteAllMarkers();
-    //visual_tools.trigger();
-    //visual_tools.prompt("Press 'next' in the RvizVisualToolsGui window to continue the demo");
-
-    //motion.place(group);
-    //visual_tools.deleteAllMarkers();
-    //visual_tools.trigger();
 
     ros::WallDuration(2.0).sleep();
     ros::shutdown();
